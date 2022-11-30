@@ -5,7 +5,7 @@ from discord import webhook
 from discord import embeds
 import datetime
 
-webhookURL = " "
+webhook_URL = " "
 
 with open("stores.json") as f:
     # Parsed from (search for "allStores=["):
@@ -76,22 +76,22 @@ def pretty_print_stock(stock):
 
 def main():
     colorama.init()
-    for maybeShonk  in range(1, 3):
-        if maybeShonk == 1:
-            shorkType = "30373588"
-            shorkName = "Bighåj"
-        elif maybeShonk == 2:
-            shorkType = "20540663"
-            shorkName = "Smolhåj"
-        print("Fetching " + shorkName + " listings…\n")
+    for maybe_shonk  in range(1, 3):
+        if maybe_shonk == 1:
+            shork_type = "30373588"
+            shork_name = "Bighåj"
+        elif maybe_shonk == 2:
+            shork_type = "20540663"
+            shork_name = "Smolhåj"
+        print("Fetching " + shork_name + " listings…\n")
 
-        bigAvailabilities = requests.get("https://api.ingka.ikea.com/cia/availabilities/ru/gb?itemNos=" + shorkType + "&expand=StoresList,Restocks,SalesLocations", headers={
+        big_availabilities = requests.get("https://api.ingka.ikea.com/cia/availabilities/ru/gb?itemNos=" + shork_type + "&expand=StoresList,Restocks,SalesLocations", headers={
             "Accept": "application/json;version=2",
             "X-Client-ID": "b6c117e5-ae61-4ef5-b4cc-e0b1e37f0631"
         })
-        bigAvailabilities = bigAvailabilities.json()
+        big_availabilities = big_availabilities.json()
         sharks = []
-        for availability in bigAvailabilities["availabilities"]:
+        for availability in big_availabilities["availabilities"]:
             stock = calculate_stock(availability)
             if stock is None:
                 continue
@@ -100,25 +100,25 @@ def main():
 
         for stock in sharks:
             pretty_print_stock(stock)
-        send_webhook(sharks, shorkName)
+        send_webhook(sharks, shork_name)
 
 
-def send_webhook(sharks, shorkName):
+def send_webhook(sharks, shork_name):
     hook = webhook.SyncWebhook.from_url(
-        webhookURL)
-    messageEmbeds = [
+        webhook_URL)
+    message_embeds = [
         embeds.Embed(
             title="Blåhaj stock in the UK",\
-            description="Here is " + shorkName + " stock for today in the UK.",\
+            description="Here is " + shork_name + " stock for today in the UK.",\
             url="https://www.ikea.com/gb/en/p/blahaj-soft-toy-shark-30373588/",\
             colour=0x6996AD,\
             timestamp=datetime.datetime.today(),
         )
 
     ]
-    messageEmbeds[0].set_footer(text = "shonk")
-    messageEmbeds[0].set_thumbnail(url="https://www.ikea.com/gb/en/images/products/blahaj-soft-toy-shark__0877368_pe633607_s5.jpg")
-    messageEmbeds[0].set_author(name = "a sentient blåhaj")
+    message_embeds[0].set_footer(text = "shonk")
+    message_embeds[0].set_thumbnail(url="https://www.ikea.com/gb/en/images/products/blahaj-soft-toy-shark__0877368_pe633607_s5.jpg")
+    message_embeds[0].set_author(name = "a sentient blåhaj")
 
     # Break up the message into two chunks (Character limit in Discord embeds cmomplains otherwise) 
     sharks1 = sharks[:len(sharks)//2]
@@ -136,10 +136,10 @@ def send_webhook(sharks, shorkName):
         else:
             rows2.append(shark["store"] + ": " + str(shark["quantity"]) + ". Restock due: " + str(shark["next_restock"]["latestDate"]))
     # Print each item in the list as its own line. 
-    messageEmbeds[0].add_field(name="Stock:", value="\n".join(rows1), inline=True)
-    messageEmbeds[0].add_field(name="Further stock:", value="\n".join(rows2), inline=True)
+    message_embeds[0].add_field(name="Stock:", value="\n".join(rows1), inline=True)
+    message_embeds[0].add_field(name="Further stock:", value="\n".join(rows2), inline=True)
 
-    hook.send(content="", username="shark-alert-bot", embeds=messageEmbeds)
+    hook.send(content="", username="shark-alert-bot", embeds=message_embeds)
 
 
 main()
